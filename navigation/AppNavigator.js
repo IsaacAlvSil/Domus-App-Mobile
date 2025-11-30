@@ -45,9 +45,9 @@ function MainTabs() {
     >
       <Tab.Screen name="Inicio" component={Dashboard} />
       <Tab.Screen name="Pagos" component={Payments} />
-      <Tab.Screen name="Avisos" component={Dashboard} />
-      <Tab.Screen name="Amenidades" component={Dashboard} />
-      <Tab.Screen name="Perfil" component={Dashboard} />
+      <Tab.Screen name="Avisos" component={Dashboard} /> {/* Temporal */}
+      <Tab.Screen name="Amenidades" component={Dashboard} /> {/* Temporal */}
+      <Tab.Screen name="Perfil" component={Dashboard} /> {/* Temporal */}
     </Tab.Navigator>
   );
 }
