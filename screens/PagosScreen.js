@@ -1,14 +1,16 @@
 // src/views/PagosScreen.js
-// VISTA: Implementa la funcionalidad CRUD (enfocada en READ y DELETE/Gestión de estado) para Pagos
-import React, { useState, useEffect } from 'react';
+// VISTA: Implementa la funcionalidad de visualización y resumen para Pagos
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { CommonStyles, Colors } from '../styles/styles';
 import AppController from '../controllers/AppController';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
+// Componente para una fila de pago individual
 const PagoItem = ({ pago, onDelete }) => {
   const isPaid = pago.estado === 'Pagado';
   const statusColor = isPaid ? Colors.pagado : Colors.pendiente;
+  const statusIcon = isPaid ? "check-circle" : "alert-circle";
 
   return (
     <View style={styles.pagoCard}>
@@ -18,92 +20,110 @@ const PagoItem = ({ pago, onDelete }) => {
       </View>
       <View style={styles.statusContainer}>
         <Text style={[styles.statusText, { color: statusColor }]}>
-          <Icon name={isPaid ? "check-circle" : "alert-circle"} size={14} color={statusColor} /> {pago.estado}
+          <Icon name={statusIcon} size={14} color={statusColor} /> {pago.estado}
         </Text>
         <Text style={styles.pagoAmount}>${pago.monto.toFixed(2)}</Text>
       </View>
       
-      {/* Simulación de la acción de eliminar pago (DELETE) */}
-      {!isPaid && (
-        <TouchableOpacity onPress={() => onDelete(pago.id)} style={styles.deleteButton}>
-          <Icon name="close-circle-outline" size={24} color={Colors.danger} />
-        </TouchableOpacity>
-      )}
+      {/* Simulación de la acción de ver detalle/navegación */}
+      <TouchableOpacity 
+        style={styles.detailArrow} 
+        onPress={() => Alert.alert('Detalle', `Monto: $${pago.monto.toFixed(2)}`)}
+      >
+        <Icon name="chevron-right" size={24} color="gray" />
+      </TouchableOpacity>
     </View>
   );
 };
 
+// Componente para la pantalla completa
 const PagosScreen = () => {
   const [pagos, setPagos] = useState([]);
-  
-  // Cargar datos iniciales (READ)
-  const fetchPagos = () => {
-    // En una app real, aquí se llamaría a la API para obtener el historial.
-    const data = AppController.getPagos();
-    setPagos(data);
-  };
+  const [yearFilter, setYearFilter] = useState('2024'); // Simulación de filtro
 
+  // Carga inicial de datos
   useEffect(() => {
-    fetchPagos();
+    // En una aplicación real, aquí usaríamos onSnapshot de Firestore
+    setPagos(AppController.getPagos());
   }, []);
 
-  // Simulación de eliminación (DELETE)
-  const handleDelete = (id) => {
+  // Función para calcular el resumen de pagos
+  const paymentSummary = useMemo(() => {
+    const filteredPagos = pagos.filter(p => p.fecha.includes(yearFilter));
+    const totalPaid = filteredPagos
+      .filter(p => p.estado === 'Pagado')
+      .reduce((sum, p) => sum + p.monto, 0);
+    const totalPending = filteredPagos
+      .filter(p => p.estado === 'Pendiente')
+      .reduce((sum, p) => sum + p.monto, 0);
+    const totalYear = totalPaid + totalPending;
+
+    return {
+      totalPaid: totalPaid.toFixed(2),
+      totalPending: totalPending.toFixed(2),
+      totalYear: totalYear.toFixed(2),
+    };
+  }, [pagos, yearFilter]);
+
+  // Manejador de eliminación simulado
+  const handleDeletePago = (id) => {
     Alert.alert(
-      'Confirmar Gestión',
-      'En una aplicación real, esto simularía la cancelación o eliminación de un pago pendiente. ¿Deseas continuar?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Simular Eliminación', onPress: () => {
-            // Nota: El modelo de Pagos no tiene un delete real, pero podemos simular el refresco de la lista.
-            setPagos(prev => prev.filter(p => p.id !== id));
-            Alert.alert('Éxito', 'Pago pendiente gestionado/eliminado (simulación).');
-          },
-          style: 'destructive',
-        },
-      ],
-      { cancelable: false },
+      "Simulación de Eliminación",
+      "La eliminación de pagos generalmente requiere permisos de administración.",
+      [{ text: "OK" }]
     );
+    // Para simular la funcionalidad de gestión (no implementada aquí)
+    // AppController.deletePago(id);
+    // setPagos(AppController.getPagos());
   };
 
-  const totalPagado = pagos.filter(p => p.estado === 'Pagado').reduce((sum, p) => sum + p.monto, 0);
-  const totalPendiente = pagos.filter(p => p.estado === 'Pendiente').reduce((sum, p) => sum + p.monto, 0);
-  const totalAnual = totalPagado + totalPendiente;
+  const currentMonthPending = pagos.find(p => p.estado === 'Pendiente' && p.mes.includes(new Date().getFullYear()));
 
   return (
     <ScrollView style={CommonStyles.container}>
-      <Text style={CommonStyles.header}>Pagos (Historial y Gestión)</Text>
+      <Text style={CommonStyles.title}>Historial de Pagos</Text>
       
-      {/* Resumen de Pagos */}
-      <View style={[CommonStyles.card, { marginBottom: 20 }]}>
-        <Text style={[CommonStyles.title, { marginBottom: 10 }]}>Resumen 2024</Text>
-        <SummaryRow label="Total pagado" value={`$${totalPagado.toFixed(2)}`} color={Colors.pagado} />
-        <SummaryRow label="Total pendiente" value={`$${totalPendiente.toFixed(2)}`} color={Colors.pendiente} />
-        <View style={styles.separator} />
-        <SummaryRow label="Total del año" value={`$${totalAnual.toFixed(2)}`} isBold={true} />
+      {/* Selector de Año (Simulación de Filtrado) */}
+      <View style={styles.filterContainer}>
+        <Text style={styles.filterLabel}>Filtrar por año</Text>
+        <TouchableOpacity style={styles.yearButton} onPress={() => Alert.alert('Filtro', 'Filtro por año no implementado.')}>
+          <Text style={styles.yearText}>{yearFilter}</Text>
+          <Icon name="chevron-down" size={20} color={Colors.primary} />
+        </TouchableOpacity>
       </View>
 
-      <Text style={[CommonStyles.title, { marginLeft: 10, marginBottom: 5 }]}>Historial de Pagos</Text>
-      
-      {/* Lista de Pagos (READ) */}
+      {/* Lista de Pagos */}
       <FlatList
-        data={pagos}
+        data={pagos.filter(p => p.fecha.includes(yearFilter)).sort((a, b) => new Date(a.fecha) - new Date(b.fecha))}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <PagoItem pago={item} onDelete={handleDelete} />}
-        scrollEnabled={false} // Para que se integre bien con el ScrollView principal
+        renderItem={({ item }) => <PagoItem pago={item} onDelete={handleDeletePago} />}
+        scrollEnabled={false} // Para permitir que el ScrollView principal maneje el scroll
       />
-      
-      {/* Simulación de botón para hacer un pago (CREATE/Acción) */}
+
+      {/* Resumen del Año */}
+      <View style={[CommonStyles.card, { marginTop: 20 }]}>
+        <Text style={CommonStyles.title}>Resumen {yearFilter}</Text>
+        <SummaryRow label="Total pagado" value={`$${paymentSummary.totalPaid}`} color={Colors.pagado} />
+        <SummaryRow label="Total pendiente" value={`$${paymentSummary.totalPending}`} color={Colors.pendiente} />
+        <View style={styles.summaryDivider} />
+        <SummaryRow label="Total del año" value={`$${paymentSummary.totalYear}`} isBold={true} />
+      </View>
+
+      {/* Botón de Pagar (Si hay algo pendiente) */}
       <TouchableOpacity 
-        style={[CommonStyles.buttonPrimary, { marginTop: 20, marginBottom: 30 }]} 
-        onPress={() => Alert.alert('Simulación', 'Aquí se integraría el formulario de pago para realizar la transacción (CREATE/Acción)')}
+        style={[CommonStyles.buttonPrimary, { marginBottom: 30, marginTop: 20 }]} 
+        onPress={() => Alert.alert('Simulación de Pago', 'Proceso de pago iniciado. (Integración con pasarela de pago).')}
+        disabled={!currentMonthPending} // Deshabilitar si no hay pagos pendientes
       >
-        <Text style={CommonStyles.buttonText}><Icon name="currency-usd" size={18} /> Realizar Pago Nuevo</Text>
+        <Text style={CommonStyles.buttonText}>
+          {currentMonthPending ? `Pagar $${currentMonthPending.monto.toFixed(2)}` : 'No hay pagos pendientes'}
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );
 };
 
+// Componente auxiliar para las filas de resumen
 const SummaryRow = ({ label, value, color, isBold }) => (
   <View style={styles.summaryRow}>
     <Text style={[styles.summaryLabel, isBold && { fontWeight: 'bold' }]}>{label}</Text>
@@ -112,6 +132,30 @@ const SummaryRow = ({ label, value, color, isBold }) => (
 );
 
 const styles = StyleSheet.create({
+  filterContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 5,
+  },
+  filterLabel: {
+    fontSize: 16,
+    color: Colors.text,
+  },
+  yearButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#E6E6FA',
+  },
+  yearText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Colors.primary,
+    marginRight: 5,
+  },
   pagoCard: {
     ...CommonStyles.card,
     flexDirection: 'row',
@@ -140,34 +184,34 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 2,
   },
   pagoAmount: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 5,
     color: Colors.text,
   },
-  deleteButton: {
-    marginLeft: 15,
-    padding: 5,
+  detailArrow: {
+    paddingLeft: 10,
   },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 5,
+    paddingVertical: 8,
   },
   summaryLabel: {
-    fontSize: 14,
+    fontSize: 16,
     color: Colors.text,
   },
   summaryValue: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
+    color: Colors.text,
   },
-  separator: {
+  summaryDivider: {
     height: 1,
     backgroundColor: '#EEE',
-    marginVertical: 5,
+    marginVertical: 10,
   },
 });
 

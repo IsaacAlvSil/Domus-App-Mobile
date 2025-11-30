@@ -9,9 +9,11 @@ import {
   ScrollView,
   Alert
 } from 'react-native';
+import { CommonStyles, Colors } from '../styles/styles';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // Simulamos la imagen del logo (misma que en LoginScreen)
-const logo = 'https://placehold.co/100x100/007bff/ffffff?text=Domus';
+const logo = 'https://placehold.co/100x100/6A5ACD/ffffff?text=Domus';
 
 // Componente principal de la pantalla de registro
 const RegisterScreen = ({ onRegisterSuccess, onNavigateToLogin }) => {
@@ -40,18 +42,16 @@ const RegisterScreen = ({ onRegisterSuccess, onNavigateToLogin }) => {
     setTimeout(() => {
       setLoading(false);
       
-      // En una app real, aquí se enviaría la solicitud de registro al backend
-      console.log('Datos de Registro:', { fullName, unitNumber, email });
-
-      // Simulación de éxito de registro
-      Alert.alert('Éxito', '¡Registro enviado! Tu cuenta está pendiente de aprobación por la administración del condominio.');
+      // Aquí se enviaría la información al backend para crear el usuario
+      Alert.alert('Registro Exitoso', 'Tu cuenta ha sido creada. Por favor, inicia sesión.');
       
-      // Llamamos al prop de navegación para regresar al login
-      if (onNavigateToLogin) {
-        onNavigateToLogin();
+      // Simula el éxito y navega a la pantalla de login
+      if (onRegisterSuccess) {
+          onRegisterSuccess(); 
+      } else {
+          onNavigateToLogin();
       }
-
-    }, 3000); // 3 segundos de simulación de carga
+    }, 1500); // Retraso de 1.5 segundos para simular la carga
   };
 
   return (
@@ -59,89 +59,71 @@ const RegisterScreen = ({ onRegisterSuccess, onNavigateToLogin }) => {
       <View style={styles.header}>
         <Image source={{ uri: logo }} style={styles.logo} />
         <Text style={styles.appName}>Domus App</Text>
-        <Text style={styles.appSubtitle}>Crear Cuenta de Residente</Text>
+        <Text style={styles.appSubtitle}>Registro de Condominios</Text>
       </View>
 
       <View style={styles.form}>
         <Text style={styles.title}>Registrarse</Text>
 
-        {/* Campo Nombre Completo */}
         <Text style={styles.label}>Nombre Completo</Text>
         <TextInput
           style={styles.input}
-          placeholder="María González"
-          placeholderTextColor="#A0AEC0"
-          autoCapitalize="words"
+          placeholder="Ej: Ana María López"
           value={fullName}
           onChangeText={setFullName}
-          editable={!loading}
+          autoCapitalize="words"
         />
-        
-        {/* Campo Número de Unidad/Departamento */}
+
         <Text style={styles.label}>Número de Unidad/Departamento</Text>
         <TextInput
           style={styles.input}
-          placeholder="Ej: A-101 o 503"
-          placeholderTextColor="#A0AEC0"
-          autoCapitalize="none"
+          placeholder="Ej: A-201"
           value={unitNumber}
           onChangeText={setUnitNumber}
-          editable={!loading}
+          autoCapitalize="characters"
         />
 
-        {/* Campo de Correo Electrónico */}
         <Text style={styles.label}>Correo Electrónico</Text>
         <TextInput
           style={styles.input}
           placeholder="tu@email.com"
-          placeholderTextColor="#A0AEC0"
-          keyboardType="email-address"
-          autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
-          editable={!loading}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
 
-        {/* Campo de Contraseña */}
         <Text style={styles.label}>Contraseña</Text>
         <TextInput
           style={styles.input}
-          placeholder="Mínimo 8 caracteres"
-          placeholderTextColor="#A0AEC0"
-          secureTextEntry
+          placeholder="Mínimo 6 caracteres"
           value={password}
           onChangeText={setPassword}
-          editable={!loading}
+          secureTextEntry
         />
         
-        {/* Campo de Confirmar Contraseña */}
         <Text style={styles.label}>Confirmar Contraseña</Text>
         <TextInput
           style={styles.input}
-          placeholder="Repite la contraseña"
-          placeholderTextColor="#A0AEC0"
-          secureTextEntry
+          placeholder="Repite tu contraseña"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
-          editable={!loading}
+          secureTextEntry
         />
 
-
-        {/* Botón Registrarse */}
-        <TouchableOpacity
-          style={styles.registerButton(loading)}
-          onPress={handleRegister}
+        <TouchableOpacity 
+          style={styles.registerButton(loading)} 
+          onPress={handleRegister} 
           disabled={loading}
         >
-          <Text style={styles.registerButtonText}>
-            {loading ? 'Enviando Solicitud...' : 'Registrarme'}
+          <Text style={CommonStyles.buttonText}>
+            {loading ? 'Registrando...' : 'Registrarse'}
           </Text>
         </TouchableOpacity>
 
-        {/* Enlace ¿Ya tienes cuenta? Iniciar Sesión */}
         <View style={styles.loginContainer}>
           <Text style={styles.loginText}>¿Ya tienes cuenta?</Text>
-          <TouchableOpacity style={styles.linkButton} onPress={onNavigateToLogin}>
+          <TouchableOpacity onPress={onNavigateToLogin}>
             <Text style={styles.linkText}>Iniciar Sesión</Text>
           </TouchableOpacity>
         </View>
@@ -150,28 +132,27 @@ const RegisterScreen = ({ onRegisterSuccess, onNavigateToLogin }) => {
   );
 };
 
-// Estilos
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#F7FAFC', // Fondo claro
-    paddingHorizontal: 20,
-    paddingVertical: 40,
+    justifyContent: 'center',
+    padding: 25,
+    backgroundColor: CommonStyles.container.backgroundColor,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 30,
   },
   logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 16,
-    marginBottom: 10,
+    width: 70,
+    height: 70,
+    borderRadius: 15,
   },
   appName: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#2D3748',
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: Colors.primary,
+    marginTop: 8,
   },
   appSubtitle: {
     fontSize: 14,
@@ -213,38 +194,30 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7FAFC',
   },
   registerButton: (loading) => ({
-    backgroundColor: loading ? '#63B3ED' : '#007AFF', // Azul primario
+    backgroundColor: loading ? '#A0AEC0' : Colors.primary, // Morado primario
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-    opacity: loading ? 0.7 : 1,
+    marginTop: 15,
   }),
-  registerButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  linkButton: {
-    paddingVertical: 5,
-  },
   linkText: {
-    color: '#007AFF',
+    color: Colors.primary,
     fontSize: 14,
-    textDecorationLine: 'underline',
+    fontWeight: '600',
   },
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
+    marginTop: 20,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
   },
   loginText: {
-    color: '#4A5568',
     fontSize: 14,
+    color: '#4A5568',
     marginRight: 5,
-  },
+  }
 });
 
 export default RegisterScreen;

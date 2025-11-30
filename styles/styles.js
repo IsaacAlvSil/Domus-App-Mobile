@@ -1,78 +1,59 @@
 // src/styles/styles.js
-// Estilos comunes para toda la app
-import { StyleSheet } from 'react-native';
+// Define estilos y colores comunes para toda la aplicación
 
-const Colors = {
-  primary: '#6A5ACD', // Morado/Azul principal
-  secondary: '#FFD700', // Dorado para resaltado (ej. Pendiente)
-  background: '#F5F5F5',
+export const Colors = {
+  primary: '#6A5ACD', // Morado principal, usado en botones, íconos activos
+  secondary: '#FFD700', // Amarillo para alertas/pendientes
   card: '#FFFFFF',
-  text: '#333333',
-  danger: '#DC3545',
-  success: '#28A745',
-  pendiente: '#FFC107',
-  pagado: '#28A745',
-  urgente: '#DC3545',
+  background: '#F8F9FA', // Fondo claro
+  text: '#212529', // Texto oscuro
+  success: '#28A745', // Verde para Pagado/Disponible
+  danger: '#DC3545', // Rojo para Peligro/Eliminar/Ocupado
+  pendiente: '#FFC107', // Amarillo para estado Pendiente
+  pagado: '#28A745', // Verde para estado Pagado
 };
 
-const CommonStyles = StyleSheet.create({
+export const CommonStyles = {
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-    padding: 10,
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.text,
-    marginBottom: 20,
-    paddingTop: 40,
-    paddingHorizontal: 10,
-    backgroundColor: Colors.card,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
-  },
-  card: {
-    backgroundColor: Colors.card,
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    paddingHorizontal: 20,
   },
   title: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
     color: Colors.text,
+    marginBottom: 10,
+    marginTop: 20,
   },
   subtitle: {
     fontSize: 14,
     color: 'gray',
+    marginBottom: 5,
+  },
+  card: {
+    backgroundColor: Colors.card,
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   buttonPrimary: {
     backgroundColor: Colors.primary,
-    padding: 12,
+    paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   buttonText: {
     color: Colors.card,
+    fontSize: 16,
     fontWeight: 'bold',
-    fontSize: 16,
   },
-  input: {
-    backgroundColor: '#fff',
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#CCC',
-    marginBottom: 10,
-    fontSize: 16,
-  },
-});
-
-export { CommonStyles, Colors };    
+};

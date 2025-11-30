@@ -15,10 +15,48 @@ const initialUser = {
   emailEnabled: false,
 };
 
+// Componente para mostrar un campo de información
+const FieldDisplay = ({ label, value, isEditing, onChangeText, fieldKey }) => (
+  <View style={styles.fieldContainer}>
+    <Text style={styles.fieldLabel}>{label}</Text>
+    {isEditing ? (
+      <TextInput
+        style={styles.fieldInput}
+        value={value}
+        onChangeText={(text) => onChangeText(fieldKey, text)}
+      />
+    ) : (
+      <Text style={styles.fieldValue}>{value}</Text>
+    )}
+  </View>
+);
+
+// Componente para manejar los toggles de notificación
+const NotificationToggle = ({ label, value, onToggle }) => (
+  <View style={styles.toggleContainer}>
+    <View>
+      <Text style={styles.toggleLabel}>{label}</Text>
+      <Text style={styles.toggleSubLabel}>Recibir alertas en tiempo real</Text>
+    </View>
+    <Switch
+      trackColor={{ false: "#EAEAEA", true: Colors.primaryLight }}
+      thumbColor={value ? Colors.primary : "#f4f3f4"}
+      onValueChange={onToggle}
+      value={value}
+    />
+  </View>
+);
+
+
 const PerfilScreen = () => {
   const [user, setUser] = useState(initialUser);
   const [isEditing, setIsEditing] = useState(false);
   const [tempUser, setTempUser] = useState(user);
+
+  // Manejar cambios en el formulario temporal (UPDATE)
+  const handleChange = (key, value) => {
+    setTempUser(prev => ({ ...prev, [key]: value }));
+  };
 
   // Guardar Cambios (UPDATE)
   const handleSave = () => {
@@ -30,130 +68,101 @@ const PerfilScreen = () => {
 
   // Cancelar Edición
   const handleCancel = () => {
-    setTempUser(user); // Descartar cambios
+    setTempUser(user);
     setIsEditing(false);
   };
 
-  // Cerrar Sesión (DELETE - Sesión)
-  const handleLogout = () => {
-    Alert.alert(
-      'Cerrar Sesión',
-      '¿Estás seguro de que quieres cerrar la sesión? (Simulación de DELETE de Sesión)',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Cerrar Sesión', onPress: () => Alert.alert('Sesión Cerrada', '¡Vuelve pronto!'), style: 'destructive' },
-      ],
-      { cancelable: false },
-    );
-  };
-
-  const renderField = (label, value, key) => (
-    <View style={styles.fieldContainer}>
-      <Text style={styles.fieldLabel}>{label}</Text>
-      {isEditing ? (
-        <TextInput
-          style={styles.fieldInput}
-          value={tempUser[key]}
-          onChangeText={(text) => setTempUser({ ...tempUser, [key]: text })}
-        />
-      ) : (
-        <Text style={styles.fieldValue}>{value}</Text>
-      )}
-    </View>
-  );
-
   return (
     <ScrollView style={CommonStyles.container}>
-      <Text style={CommonStyles.header}>Mi Perfil</Text>
-
-      {/* Foto de Perfil */}
-      <View style={styles.profileHeader}>
-        <View style={styles.avatarPlaceholder}><Icon name="account" size={60} color="#FFF" /></View>
-        <Text style={styles.userName}>{user.nombreCompleto.split(' ')[0]} {user.nombreCompleto.split(' ')[2]}</Text>
+      <View style={styles.header}>
+        <Icon name="account-circle" size={80} color={Colors.primary} />
+        <Text style={styles.userName}>María González</Text>
         <Text style={styles.userRole}>Residente</Text>
       </View>
 
-      {/* Información Personal */}
+      {/* Tarjeta de Información Personal (READ/UPDATE) */}
       <View style={CommonStyles.card}>
         <Text style={CommonStyles.title}>Información Personal</Text>
-        {renderField('Nombre completo', user.nombreCompleto, 'nombreCompleto')}
-        {renderField('Departamento', user.departamento, 'departamento')}
-        {renderField('Correo electrónico', user.correo, 'correo')}
-        {renderField('Teléfono', user.telefono, 'telefono')}
+        <FieldDisplay
+          label="Nombre completo"
+          value={tempUser.nombreCompleto}
+          isEditing={isEditing}
+          onChangeText={handleChange}
+          fieldKey="nombreCompleto"
+        />
+        <FieldDisplay
+          label="Departamento"
+          value={tempUser.departamento}
+          isEditing={isEditing}
+          onChangeText={handleChange}
+          fieldKey="departamento"
+        />
+        <FieldDisplay
+          label="Correo electrónico"
+          value={tempUser.correo}
+          isEditing={isEditing}
+          onChangeText={handleChange}
+          fieldKey="correo"
+        />
+        <FieldDisplay
+          label="Teléfono"
+          value={tempUser.telefono}
+          isEditing={isEditing}
+          onChangeText={handleChange}
+          fieldKey="telefono"
+        />
       </View>
 
-      {/* Notificaciones */}
+      {/* Tarjeta de Notificaciones (UPDATE) */}
       <View style={CommonStyles.card}>
         <Text style={CommonStyles.title}>Notificaciones</Text>
-        <NotificationToggle 
-            label="Notificaciones push" 
-            isEnabled={tempUser.pushEnabled}
-            isEditing={isEditing}
-            onToggle={(value) => setTempUser({ ...tempUser, pushEnabled: value })}
+        <NotificationToggle
+          label="Notificaciones push"
+          value={tempUser.pushEnabled}
+          onToggle={() => handleChange('pushEnabled', !tempUser.pushEnabled)}
         />
-        <NotificationToggle 
-            label="Notificaciones por email" 
-            isEnabled={tempUser.emailEnabled}
-            isEditing={isEditing}
-            onToggle={(value) => setTempUser({ ...tempUser, emailEnabled: value })}
+        <NotificationToggle
+          label="Notificaciones por email"
+          value={tempUser.emailEnabled}
+          onToggle={() => handleChange('emailEnabled', !tempUser.emailEnabled)}
         />
       </View>
 
-      {/* Botones de Acción */}
-      {!isEditing ? (
-        <TouchableOpacity style={[CommonStyles.buttonPrimary, styles.actionButton]} onPress={() => setIsEditing(true)}>
-          <Text style={CommonStyles.buttonText}><Icon name="pencil" size={18} /> Editar Perfil</Text>
-        </TouchableOpacity>
-      ) : (
-        <View style={styles.editButtonsContainer}>
-          <TouchableOpacity 
-            style={[CommonStyles.buttonPrimary, styles.editButton, { backgroundColor: '#AAA' }]} 
-            onPress={handleCancel}
-          >
-            <Text style={CommonStyles.buttonText}>Cancelar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[CommonStyles.buttonPrimary, styles.editButton]} 
-            onPress={handleSave}
-          >
-            <Text style={CommonStyles.buttonText}>Guardar</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      {/* Tarjeta de Métodos de Pago */}
+      <View style={CommonStyles.card}>
+        <Text style={CommonStyles.title}>Métodos de Pago</Text>
+        <Text style={CommonStyles.subtitle}>Próximamente disponible</Text>
+      </View>
 
-      {/* Cerrar Sesión */}
-      <TouchableOpacity style={[styles.logoutButton, styles.actionButton]} onPress={handleLogout}>
-        <Text style={styles.logoutText}><Icon name="logout" size={18} color={Colors.danger} /> Cerrar Sesión</Text>
-      </TouchableOpacity>
+      {/* Botones de Acción (Editar/Guardar/Cancelar) */}
+      <View style={{ marginBottom: 40, marginTop: 10 }}>
+        {isEditing ? (
+          <View>
+            <TouchableOpacity style={CommonStyles.buttonPrimary} onPress={handleSave}>
+              <Text style={CommonStyles.buttonText}><Icon name="content-save-outline" size={18} /> Guardar Cambios</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[CommonStyles.buttonPrimary, { backgroundColor: Colors.danger, marginTop: 10 }]} onPress={handleCancel}>
+              <Text style={CommonStyles.buttonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity style={CommonStyles.buttonPrimary} onPress={() => setIsEditing(true)}>
+            <Text style={CommonStyles.buttonText}><Icon name="pencil" size={18} /> Editar Perfil</Text>
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity style={[styles.actionButton, { marginTop: 20 }]} onPress={() => Alert.alert('Cerrar Sesión', 'Se cerrará la sesión de la aplicación.')}>
+          <Text style={styles.actionButtonText}><Icon name="logout" size={18} color={Colors.danger} /> Cerrar Sesión</Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };
 
-const NotificationToggle = ({ label, isEnabled, isEditing, onToggle }) => (
-    <View style={styles.toggleContainer}>
-        <Text style={styles.toggleLabel}>{label}</Text>
-        <Switch
-            trackColor={{ false: "#767577", true: Colors.primary }}
-            thumbColor={isEnabled ? "#f4f3f4" : "#f4f3f4"}
-            onValueChange={onToggle}
-            value={isEnabled}
-            disabled={!isEditing}
-        />
-    </View>
-);
-
 const styles = StyleSheet.create({
-  profileHeader: {
+  header: {
     alignItems: 'center',
-    marginVertical: 20,
-  },
-  avatarPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingVertical: 20,
   },
   userName: {
     fontSize: 22,
@@ -188,6 +197,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
     borderBottomWidth: 1,
     borderBottomColor: Colors.primary,
+    paddingHorizontal: 0,
+    paddingBottom: 2,
   },
   toggleContainer: {
     flexDirection: 'row',
@@ -200,33 +211,21 @@ const styles = StyleSheet.create({
   toggleLabel: {
     fontSize: 16,
     color: Colors.text,
+    fontWeight: '500',
+  },
+  toggleSubLabel: {
+    fontSize: 12,
+    color: 'gray',
   },
   actionButton: {
-    marginTop: 20,
-    padding: 15,
+    paddingVertical: 10,
+    alignItems: 'center',
   },
-  editButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  editButton: {
-    flex: 1,
-    marginHorizontal: 5,
-    padding: 15,
-  },
-  logoutButton: {
-    backgroundColor: '#FFF',
-    borderWidth: 1,
-    borderColor: Colors.danger,
-    marginBottom: 50,
-  },
-  logoutText: {
-    color: Colors.danger,
-    fontWeight: 'bold',
+  actionButtonText: {
     fontSize: 16,
-    textAlign: 'center',
-  },
+    color: Colors.danger,
+    fontWeight: '600',
+  }
 });
 
 export default PerfilScreen;

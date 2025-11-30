@@ -6,10 +6,12 @@ class AppController {
   // --- AVISOS CRUD ---
 
   getAvisos() {
-    return DataModel.getAvisos();
+    // Retorna los avisos en orden inverso para que los más nuevos aparezcan primero
+    return DataModel.getAvisos().reverse();
   }
 
   crearAviso(avisoData) {
+    // Simula la adición y retorna el nuevo aviso con ID
     return DataModel.addAviso(avisoData);
   }
 
@@ -33,6 +35,7 @@ class AppController {
     return DataModel.getAmenidades();
   }
 
+  // Simula la acción de reservar/cancelar
   toggleReservaAmenidad(id) {
     return DataModel.toggleAmenidadStatus(id);
   }

@@ -14,11 +14,15 @@ class DataModel {
       { id: 'p2', mes: 'Febrero 2024', fecha: '15 Feb 2024', monto: 1250.00, estado: 'Pagado' },
       { id: 'p3', mes: 'Marzo 2024', fecha: '15 Mar 2024', monto: 1250.00, estado: 'Pagado' },
       { id: 'p4', mes: 'Abril 2024', fecha: '15 Abr 2024', monto: 1250.00, estado: 'Pendiente' },
+      { id: 'p5', mes: 'Mayo 2024', fecha: '15 May 2024', monto: 1250.00, estado: 'Pendiente' },
+      { id: 'p6', mes: 'Junio 2024', fecha: '15 Jun 2024', monto: 1250.00, estado: 'Pagado' },
+      { id: 'p7', mes: 'Julio 2024', fecha: '15 Jul 2024', monto: 1250.00, estado: 'Pagado' },
     ];
     this.amenidades = [
       { id: 'a1', nombre: 'Alberca', horario: '6:00 AM - 10:00 PM', estado: 'Disponible' },
       { id: 'a2', nombre: 'Gimnasio', horario: '5:00 AM - 11:00 PM', estado: 'Disponible' },
       { id: 'a3', nombre: 'Salón de Eventos', horario: '8:00 AM - 12:00 AM', estado: 'Ocupado' },
+      { id: 'a4', nombre: 'Cancha de Tenis', horario: '6:00 AM - 10:00 PM', estado: 'Disponible' },
     ];
   }
 
@@ -54,28 +58,34 @@ class DataModel {
     return this.avisos.length < initialLength; // Retorna true si se eliminó
   }
 
-  // --- MÉTODOS CRUD PARA PAGOS (Simplificado, solo lectura) ---
+  // --- MÉTODOS PARA PAGOS (Solo lectura/lista) ---
 
   getPagos() {
     return this.pagos;
   }
 
-  // --- MÉTODOS CRUD PARA AMENIDADES ---
+  // --- MÉTODOS PARA AMENIDADES ---
 
   getAmenidades() {
     return this.amenidades;
   }
 
-  // Update: Simular Reserva (Actualizar estado de amenidad)
+  // Update: Cambiar estado de reserva (simula CREATE/DELETE de reserva)
   toggleAmenidadStatus(id) {
-    const amenidad = this.amenidades.find(a => a.id === id);
-    if (amenidad) {
-      amenidad.estado = amenidad.estado === 'Disponible' ? 'Ocupado' : 'Disponible';
-      return amenidad;
+    const index = this.amenidades.findIndex(a => a.id === id);
+    if (index !== -1) {
+      const currentStatus = this.amenidades[index].estado;
+      this.amenidades[index].estado = (currentStatus === 'Disponible' ? 'Ocupado' : 'Disponible');
+      return this.amenidades[index];
     }
     return null;
   }
+
+  // --- MÉTODOS DE USUARIO (Perfil) ---
+  // (Simplificado, los datos del usuario se manejan en la vista por ahora,
+  // pero aquí estaría la lógica para interactuar con la BD real)
+
+  // ... (otros métodos como getServicios, getAusencias, etc.)
 }
 
-// Exportar una instancia única (Singleton) del Modelo
 export default new DataModel();

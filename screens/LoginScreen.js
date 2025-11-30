@@ -9,13 +9,14 @@ import {
   ScrollView,
   Alert
 } from 'react-native';
+import { CommonStyles, Colors } from '../styles/styles';
 
 // Simulamos la imagen del logo
 const logo = 'https://placehold.co/100x100/007bff/ffffff?text=Domus';
 
 // Componente principal de la pantalla de inicio de sesión
-// Aceptamos props para manejar la lógica de navegación real fuera del componente
-const LoginScreen = ({ onLoginSuccess, onNavigateToRegister, onForgotPassword }) => {
+// Ahora acepta 'onLoginSuccess' y 'navigation'
+const LoginScreen = ({ navigation, onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,17 +37,12 @@ const LoginScreen = ({ onLoginSuccess, onNavigateToRegister, onForgotPassword })
       
       // Aquí se validaría el inicio de sesión con el backend
       if (email === 'tu@email.com' && password === '1234') {
-        // En lugar de Alert y console.log, llamamos al prop de éxito de navegación
-        if (onLoginSuccess) {
-          onLoginSuccess();
-        } else {
-          // Fallback solo para desarrollo si el prop no se pasa
-          Alert.alert('Éxito', '¡Inicio de sesión exitoso! (Falta prop onLoginSuccess)');
-        }
+        // Llama a la función de App.js para cambiar el estado a autenticado
+        onLoginSuccess(); 
       } else {
-        Alert.alert('Error', 'Credenciales inválidas. Inténtalo de nuevo.');
+        Alert.alert('Error de Sesión', 'Credenciales incorrectas. Usa tu@email.com y 1234.');
       }
-    }, 2000); // 2 segundos de simulación de carga
+    }, 1500);
   };
 
   return (
@@ -60,75 +56,71 @@ const LoginScreen = ({ onLoginSuccess, onNavigateToRegister, onForgotPassword })
       <View style={styles.form}>
         <Text style={styles.title}>Iniciar Sesión</Text>
 
-        {/* Campo de Correo Electrónico */}
         <Text style={styles.label}>Correo Electrónico</Text>
         <TextInput
           style={styles.input}
           placeholder="tu@email.com"
-          placeholderTextColor="#A0AEC0"
-          keyboardType="email-address"
-          autoCapitalize="none"
           value={email}
           onChangeText={setEmail}
-          editable={!loading}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
 
-        {/* Campo de Contraseña */}
         <Text style={styles.label}>Contraseña</Text>
         <TextInput
           style={styles.input}
           placeholder="...."
-          placeholderTextColor="#A0AEC0"
-          secureTextEntry
           value={password}
           onChangeText={setPassword}
-          editable={!loading}
+          secureTextEntry
         />
 
-        {/* Botón Iniciar Sesión */}
+        <TouchableOpacity
+          style={styles.forgotPassword}
+          onPress={() => Alert.alert('Recuperar Contraseña', 'Función de recuperación de contraseña en desarrollo.')}
+        >
+          <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.loginButton(loading)}
           onPress={handleLogin}
           disabled={loading}
         >
-          <Text style={styles.loginButtonText}>
+          <Text style={CommonStyles.buttonText}>
             {loading ? 'Cargando...' : 'Iniciar Sesión'}
           </Text>
         </TouchableOpacity>
+      </View>
 
-        {/* Enlace ¿Olvidaste tu contraseña? */}
-        <TouchableOpacity style={styles.linkButton} onPress={onForgotPassword}>
-          <Text style={styles.linkText}>¿Olvidaste tu contraseña?</Text>
+      <View style={styles.registerContainer}>
+        <Text style={styles.registerText}>¿No tienes cuenta?</Text>
+        <TouchableOpacity
+          style={styles.registerLink}
+          onPress={() => navigation.navigate('Register')}
+        >
+          <Text style={styles.registerLinkText}>Registrarse</Text>
         </TouchableOpacity>
-
-        {/* Enlaces ¿No tienes cuenta? Registrarse */}
-        <View style={styles.registerContainer}>
-          <Text style={styles.registerText}>¿No tienes cuenta?</Text>
-          <TouchableOpacity style={styles.linkButton} onPress={onNavigateToRegister}>
-            <Text style={styles.linkText}>Registrarse</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </ScrollView>
   );
 };
 
-// Estilos utilizando la convención de React Native
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
+    justifyContent: 'center',
+    padding: 25,
     backgroundColor: '#F7FAFC', // Fondo claro
-    paddingHorizontal: 20,
-    paddingVertical: 40,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 40,
   },
   logo: {
     width: 100,
     height: 100,
-    borderRadius: 20,
+    borderRadius: 50,
     marginBottom: 10,
   },
   appName: {
@@ -137,7 +129,7 @@ const styles = StyleSheet.create({
     color: '#2D3748',
   },
   appSubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#4A5568',
     marginTop: 5,
   },
@@ -176,38 +168,35 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7FAFC',
   },
   loginButton: (loading) => ({
-    backgroundColor: loading ? '#63B3ED' : '#007AFF', // Azul primario
+    backgroundColor: loading ? '#63B3ED' : Colors.primary, // Azul primario
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
-    marginBottom: 20,
-    opacity: loading ? 0.7 : 1,
   }),
-  loginButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '700',
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginBottom: 20,
   },
-  linkButton: {
-    alignSelf: 'center',
-    paddingVertical: 5,
-  },
-  linkText: {
-    color: '#007AFF',
+  forgotPasswordText: {
+    color: Colors.primary,
     fontSize: 14,
-    textDecorationLine: 'underline',
+    fontWeight: '500',
   },
   registerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
     marginTop: 30,
   },
   registerText: {
     color: '#4A5568',
     fontSize: 14,
-    marginRight: 5,
+  },
+  registerLinkText: {
+    color: Colors.primary,
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginLeft: 5,
   },
 });
 
