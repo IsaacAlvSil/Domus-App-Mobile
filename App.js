@@ -1,72 +1,59 @@
+// Archivo principal: configura la navegación y la app.
+import 'react-native-gesture-handler';
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// Importar pantallas
-import Login from '../screens/Login';
-import Dashboard from '../screens/Dashboard';
-import Payments from '../screens/Payments';
+// Importación de Vistas (Screens)
+import DashboardScreen from './screens/DashboardScreen';
+import PagosScreen from './screens/PagosScreen';
+import AvisosScreen from './screens/AvisosScreen';
+import AmenidadesScreen from './screens/AmenidadesScreen';
+import PerfilScreen from './screens/PerfilScreen';
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
 
-function MainTabs() {
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-          switch (route.name) {
-            case 'Inicio':
-              iconName = focused ? 'home' : 'home-outline';
-              break;
-            case 'Pagos':
-              iconName = focused ? 'card' : 'card-outline';
-              break;
-            case 'Avisos':
-              iconName = focused ? 'notifications' : 'notifications-outline';
-              break;
-            case 'Amenidades':
-              iconName = focused ? 'business' : 'business-outline';
-              break;
-            case 'Perfil':
-              iconName = focused ? 'person' : 'person-outline';
-              break;
-            default:
-              iconName = 'help-outline';
-          }
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: 'gray',
-      })}
-    >
-      <Tab.Screen name="Inicio" component={Dashboard} />
-      <Tab.Screen name="Pagos" component={Payments} />
-      <Tab.Screen name="Avisos" component={Dashboard} />
-      <Tab.Screen name="Amenidades" component={Dashboard} />
-      <Tab.Screen name="Perfil" component={Dashboard} />
-    </Tab.Navigator>
-  );
-}
-
-export default function AppNavigator() {
+const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen 
-          name="Login" 
-          component={Login} 
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen 
-          name="Main" 
-          component={MainTabs} 
-          options={{ headerShown: false }}
-        />
-      </Stack.Navigator>
+      <Tab.Navigator
+        initialRouteName="Inicio"
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color, size }) => {
+            let iconName;
+            // Definición de íconos según las interfaces PDF
+            if (route.name === 'Inicio') {
+              iconName = 'home-city';
+            } else if (route.name === 'Pagos') {
+              iconName = 'credit-card-outline';
+            } else if (route.name === 'Avisos') {
+              iconName = 'bell-outline';
+            } else if (route.name === 'Amenidades') {
+              iconName = 'table-tennis';
+            } else if (route.name === 'Perfil') {
+              iconName = 'account-circle-outline';
+            }
+            return <Icon name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: '#6A5ACD', // Color morado/azul de las interfaces
+          tabBarInactiveTintColor: 'gray',
+          headerShown: false, // Ocultar el encabezado por defecto, cada pantalla lo puede manejar
+          tabBarStyle: {
+            paddingBottom: 5,
+            paddingTop: 5,
+            height: 60,
+          },
+        })}
+      >
+        <Tab.Screen name="Inicio" component={DashboardScreen} />
+        <Tab.Screen name="Pagos" component={PagosScreen} />
+        <Tab.Screen name="Avisos" component={AvisosScreen} />
+        <Tab.Screen name="Amenidades" component={AmenidadesScreen} />
+        <Tab.Screen name="Perfil" component={PerfilScreen} />
+      </Tab.Navigator>
     </NavigationContainer>
   );
-}
+};
+
+export default App;
