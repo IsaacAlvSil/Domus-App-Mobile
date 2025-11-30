@@ -19,6 +19,7 @@ import VisitorScreen from './screens/VisitorScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import RegisterScreen from './screens/RegisterScreen';
 
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
